@@ -1,10 +1,9 @@
 import React, {Component} from 'react'
 import Web3 from 'web3'
 import blocknativeSDK from 'bnc-sdk';
-import logo from './logo.svg';
 import './App.css';
 import Onboard from '@web3-onboard/core'
-import WebSocket from 'ws'
+import Notify from "bnc-notify"
 import injectedModule from '@web3-onboard/injected-wallets'
 
 
@@ -15,6 +14,11 @@ const blocknative = new blocknativeSDK({
   networkId: NETWORK_ID
 })
 
+var notify = Notify({
+  dappId: DAPP_ID,
+  networkId: NETWORK_ID
+});
+
 const {clientIndex} = blocknative
 
 const provider = window.ethereum
@@ -22,19 +26,23 @@ console.log(provider)
 const web3 = new Web3(provider)
 
 
+const INFURA_ID = "eb347fc6f4b84938bf8b111cc08a4814"
 async function send() {
   const accounts = await web3.eth.getAccounts()
   console.log(await web3.eth.accounts)
   const address = accounts[0]
+  const receiverAddress = '0x79B4455b07B63D7Fd2AEc15bDd0ded8d1679AD7D'
   
   const txOptions ={
     from: address,
-    to:'0x79B4455b07B63D7Fd2AEc15bDd0ded8d1679AD7D',
+    to: receiverAddress,
     value: '100000000'
   }
 
   web3.eth.sendTransaction(txOptions).on('transactionHash', hash => {
-    const { emitter } =blocknative.transaction(hash)
+    const { emitter } =notify.hash(hash)
+
+    notify.on(hash())
 
     emitter.on('all', transaction => {
       console.log(`Transaction event: ${transaction.eventCode}`)
@@ -55,7 +63,6 @@ const MAINNET_RPC_URL = 'https://mainnet.infura.io/v3/<INFURA_KEY>'
 
 const injected = injectedModule()
 
-const INFURA_ID = "eb347fc6f4b84938bf8b111cc08a4814"
 
 const onboard = Onboard({
   wallets: [injected],
@@ -111,6 +118,7 @@ const onboard = Onboard({
 
 async function connectWallet() {
   const wallets = await onboard.connectWallet()
+
   console.log(wallets)
 }
 

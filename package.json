@@ -9,6 +9,7 @@
     "@web3-onboard/core": "^2.2.0",
     "@web3-onboard/injected-wallets": "^2.0.5",
     "bnc-notify": "^1.9.4",
+    "discord.js": "^13.7.0",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-scripts": "4.0.3",
